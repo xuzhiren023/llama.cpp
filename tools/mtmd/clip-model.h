@@ -65,7 +65,7 @@ struct clip_hparams {
     int32_t image_max_pixels = -1;
     resize_algo image_resize_algo = RESIZE_ALGO_BICUBIC;
     pad_style image_resize_pad = PAD_CEIL; // padding style when resizing
-    std::array<uint8_t, 3> image_pad_color = {0, 0, 0};
+    std::array<uint8_t, 3> image_pad_color = {{0, 0, 0}};
 
     // (preprocessor) for llava-uhd style models
     std::vector<clip_image_size> image_res_candidates;
@@ -77,8 +77,8 @@ struct clip_hparams {
     resize_algo image_resize_algo_ov = RESIZE_ALGO_BICUBIC;
     pad_style image_pad_rf = PAD_CEIL;  // padding style for the refined image (e.g. llava-1.6)
     pad_style image_pad_ov = PAD_NONE;  // padding style for the overview image (e.g. llava-1.6)
-    std::array<uint8_t, 3> image_pad_color_rf = {0, 0, 0}; // padding color for refined image
-    std::array<uint8_t, 3> image_pad_color_ov = {0, 0, 0}; // padding color for overview image
+    std::array<uint8_t, 3> image_pad_color_rf = {{0, 0, 0}}; // padding color for refined image
+    std::array<uint8_t, 3> image_pad_color_ov = {{0, 0, 0}}; // padding color for overview image
 
     float image_mean[3];
     float image_std[3];
@@ -853,8 +853,8 @@ struct clip_model {
     ggml_tensor * resample_query_1024 = nullptr;
 
     // lfm2 audio
-    std::array<ggml_tensor *, 7> pre_encode_conv_X_w = {nullptr};
-    std::array<ggml_tensor *, 7> pre_encode_conv_X_b = {nullptr};
+    std::array<ggml_tensor *, 7> pre_encode_conv_X_w = {{nullptr}};
+    std::array<ggml_tensor *, 7> pre_encode_conv_X_b = {{nullptr}};
     ggml_tensor * pre_encode_out_w = nullptr;
     ggml_tensor * pre_encode_out_b = nullptr;
 
@@ -871,9 +871,9 @@ struct clip_model {
     std::map<std::string, clamp_info> clamp_info_map;
 
     // gemma4 audio conformer
-    std::array<ggml_tensor *, 2> sscp_conv_w = {nullptr};
-    std::array<ggml_tensor *, 2> sscp_conv_b = {nullptr};
-    std::array<ggml_tensor *, 2> sscp_norm_w = {nullptr};
+    std::array<ggml_tensor *, 2> sscp_conv_w = {{nullptr}};
+    std::array<ggml_tensor *, 2> sscp_conv_b = {{nullptr}};
+    std::array<ggml_tensor *, 2> sscp_norm_w = {{nullptr}};
     ggml_tensor * sscp_inp_proj_w = nullptr;
     ggml_tensor * sscp_inp_proj_b = nullptr;
     ggml_tensor * audio_out_proj_w = nullptr;

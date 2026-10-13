@@ -18,6 +18,8 @@
 #include <cinttypes>
 #include <vector>
 
+mtmd_helper_logger g_logger;
+
 //#define MTMD_AUDIO_DEBUG
 
 #define MINIAUDIO_IMPLEMENTATION

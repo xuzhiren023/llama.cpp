@@ -3,7 +3,7 @@
 // Implementation based on approach suggested by Acly
 // See: https://github.com/ggml-org/llama.cpp/pull/17383#issuecomment-3554227091
 static ggml_tensor * window_partition(ggml_context * ctx0, ggml_tensor * x, const int window) {
-    auto [c, w, h, b] = x->ne;
+    const int64_t c = x->ne[0], w = x->ne[1], h = x->ne[2], b = x->ne[3];
     // same as
     // x = ggml_win_part(m, x, window);
     // x = ggml_reshape_3d(m, x, c, window * window, x->ne[3]);

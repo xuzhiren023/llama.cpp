@@ -2284,7 +2284,8 @@ struct clip_model_loader {
                 throw std::runtime_error(string_format("%s: failed to find tensor %s\n", __func__, name.c_str()));
             }
 
-            if (const auto type = gguf_get_tensor_type(ctx_gguf.get(), idx); type != GGML_TYPE_F32) {
+            const auto type = gguf_get_tensor_type(ctx_gguf.get(), idx);
+            if (type != GGML_TYPE_F32) {
                 throw std::runtime_error(string_format("%s: %s must be %s, was %s\n", __func__,
                             name.c_str(), ggml_type_name(GGML_TYPE_F32), ggml_type_name(type)));
             }
@@ -5403,7 +5404,7 @@ bool clip_encode(struct clip_ctx * ctx, struct clip_encode_params * params) {
                     //   144 for 768 tile views
                     const int   num_image_tokens = num_patches / 16;
                     const int   seq_len          = num_image_tokens * 2;
-                    std::vector qwen2_mask(static_cast<size_t>(seq_len) * seq_len, 0.0f);
+                    std::vector<float> qwen2_mask(static_cast<size_t>(seq_len) * seq_len, 0.0f);
 
                     // attention mask layout
                     //  +--------------+---------------+
@@ -5532,17 +5533,17 @@ bool clip_encode(struct clip_ctx * ctx, struct clip_encode_params * params) {
                     const float fy = ((float)y + 0.5f) / sy - 0.5f;
                     int y0 = (int)std::floor(fy);
                     int y1 = y0 + 1;
-                    y0 = std::clamp(y0, 0, n_grid - 1);
-                    y1 = std::clamp(y1, 0, n_grid - 1);
-                    float wy1 = std::clamp(fy - (float)y0, 0.0f, 1.0f);
+                    y0 = ggml_clamp(y0, 0, n_grid - 1);
+                    y1 = ggml_clamp(y1, 0, n_grid - 1);
+                    float wy1 = ggml_clamp(fy - (float)y0, 0.0f, 1.0f);
                     const float wy0 = 1.0f - wy1;
                     for (int x = 0; x < out_w; ++x) {
                         const float fx = ((float)x + 0.5f) / sx - 0.5f;
                         int x0 = (int)std::floor(fx);
                         int x1 = x0 + 1;
-                        x0 = std::clamp(x0, 0, n_grid - 1);
-                        x1 = std::clamp(x1, 0, n_grid - 1);
-                        float wx1 = std::clamp(fx - (float)x0, 0.0f, 1.0f);
+                        x0 = ggml_clamp(x0, 0, n_grid - 1);
+                        x1 = ggml_clamp(x1, 0, n_grid - 1);
+                        float wx1 = ggml_clamp(fx - (float)x0, 0.0f, 1.0f);
                         const float wx0 = 1.0f - wx1;
 
                         const float w00 = wy0 * wx0;
@@ -6246,8 +6247,8 @@ const clip_hparams * clip_get_hparams(const struct clip_ctx * ctx) {
 
 std::map<ggml_backend_dev_t, size_t> clip_get_mem_usage(const struct clip_ctx * ctx) {
     std::map<ggml_backend_dev_t, size_t> result = ctx->mem_usage;
-    for (auto & [dev, size] : ctx->mem_compute) {
-        result[dev] += size;
+    for (const auto & entry : ctx->mem_compute) {
+        result[entry.first] += entry.second;
     }
     return result;
 }

@@ -12,6 +12,10 @@
 #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
 
 struct build_vit_opts {
+#ifdef __k1om__
+    // GCC 5 fails to emit the vector constructor for the aggregate default argument.
+    build_vit_opts() : attn_mask_layers() {}
+#endif
     ggml_tensor * attn_mask = nullptr;
     // TODO @ngxson : merge attn_mask and attn_mask_layers into one call
     std::vector<ggml_tensor *> attn_mask_layers; // one per layer

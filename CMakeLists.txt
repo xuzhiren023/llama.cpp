@@ -236,8 +236,8 @@ add_subdirectory(src)
 
 add_subdirectory(vendor)
 
-if (GGML_KNC AND (LLAMA_BUILD_COMMON OR LLAMA_BUILD_TOOLS OR LLAMA_BUILD_APP OR LLAMA_BUILD_MTMD))
-    message(FATAL_ERROR "KNC currently supports the core library, simple example and focused tests; disable LLAMA_BUILD_COMMON, LLAMA_BUILD_TOOLS, LLAMA_BUILD_APP and LLAMA_BUILD_MTMD")
+if (GGML_KNC AND (LLAMA_BUILD_COMMON OR LLAMA_BUILD_TOOLS OR LLAMA_BUILD_APP))
+    message(FATAL_ERROR "KNC requires LLAMA_BUILD_COMMON, LLAMA_BUILD_TOOLS and LLAMA_BUILD_APP disabled")
 endif()
 
 if (LLAMA_BUILD_COMMON)
@@ -292,6 +292,11 @@ endif()
 option(LLAMA_BUILD_MTMD "llama: build tools/mtmd library standalone" OFF)
 if (LLAMA_BUILD_MTMD AND NOT (LLAMA_BUILD_COMMON AND LLAMA_BUILD_TOOLS))
     add_subdirectory(tools/mtmd)
+endif()
+
+option(LLAMA_BUILD_KNC_RUNNER "llama: build the standalone KNC text/image runner" OFF)
+if (LLAMA_BUILD_KNC_RUNNER)
+    add_subdirectory(examples/knc)
 endif()
 
 #

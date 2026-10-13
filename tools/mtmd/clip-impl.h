@@ -3,6 +3,7 @@
 #include "ggml.h"
 #include "gguf.h"
 #include "clip.h"
+#include "mtmd-cpp-compat.h"
 
 #include <array>
 #include <climits>
@@ -991,13 +992,13 @@ static std::vector<std::string> string_split_str(std::string s, const std::strin
 }
 
 // remove when moving to c++20
-inline bool string_starts_with(std::string_view str, std::string_view prefix) {
+inline bool string_starts_with(mtmd_string_view str, mtmd_string_view prefix) {
     return str.size() >= prefix.size() &&
            str.compare(0, prefix.size(), prefix) == 0;
 }
 
 // remove when moving to c++20
-inline bool string_ends_with(std::string_view str, std::string_view suffix) {
+inline bool string_ends_with(mtmd_string_view str, mtmd_string_view suffix) {
     return str.size() >= suffix.size() &&
            str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
 }

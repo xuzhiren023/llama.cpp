@@ -152,7 +152,7 @@ static void dft_impl(const mtmd_audio_cache & cache, const float * in, int N, fl
             float cos_val = cache.cos_vals[idx];
             float sin_val = cache.sin_vals[idx];
 
-            if constexpr (RealInput) {
+            GGML_IF_CONSTEXPR (RealInput) {
                 // Real input: in_im = 0, simplifies to:
                 // re += in_re * cos_val
                 // im += sign * in_re * sin_val
@@ -186,7 +186,7 @@ static void fft_impl(const mtmd_audio_cache & cache, float * in, int N, float * 
 
     if (N == 1) {
         out[0] = in[0];
-        if constexpr (RealInput) {
+        GGML_IF_CONSTEXPR (RealInput) {
             out[1] = 0.0f;
         } else {
             out[1] = in[1];
@@ -202,7 +202,7 @@ static void fft_impl(const mtmd_audio_cache & cache, float * in, int N, float * 
     }
 
     // Split into even and odd
-    if constexpr (RealInput) {
+    GGML_IF_CONSTEXPR (RealInput) {
         // Real input: stride is 1, copy only real values
         float * even = in + N;
         for (int i = 0; i < half_N; ++i) {

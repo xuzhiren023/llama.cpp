@@ -243,7 +243,8 @@ struct mtmd_image_tokens {
         if (pos == MTMD_POS_TYPE_CANVAS) {
             uint32_t n = 0;
             for (size_t k = 0; k < batch_f32.entries.size(); ++k) {
-                const auto [gw, gh] = canvas_tile_grid(k);
+                const auto grid = canvas_tile_grid(k);
+                const auto gw = grid.first, gh = grid.second;
                 n += gw * gh + (uint32_t) clip_suffix_rows(batch_f32.entries[k].suffix_type).size();
             }
             return n;
@@ -1287,11 +1288,13 @@ struct mtmd_tokenizer {
                     if (res == 0) {
                         // OK, append the returned chunk; lazy part is not yet added
                         if (out_bm) {
-                            auto & ptr = bm_from_lazy.emplace_back(out_bm); // remember to free it later
+                            bm_from_lazy.emplace_back(out_bm); // remember to free it later
+                            auto & ptr = bm_from_lazy.back();
                             expanded.push_back({"", ptr.ptr.get()});
                             LOG_DBG("%s: lazy callback returned bitmap with dimensions %d x %d\n", __func__, out_bm->nx, out_bm->ny);
                         } else if (out_str) {
-                            auto & ptr = text_from_lazy.emplace_back(out_str); // remember to free it later
+                            text_from_lazy.emplace_back(out_str); // remember to free it later
+                            auto & ptr = text_from_lazy.back();
                             expanded.push_back({ptr, nullptr, parse_special});
                             LOG_DBG("%s: lazy callback returned text: %s\n", __func__, out_str);
                         }
@@ -2647,7 +2650,8 @@ static mtmd_decoder_pos mtmd_canvas_decoder_pos(const mtmd_image_tokens * image_
     mtmd_decoder_pos pos;
     uint32_t t = pos_0;
     for (size_t k = 0; k < entries.size(); ++k) {
-        const auto [gw, gh] = image_tokens->canvas_tile_grid(k);
+        const auto tile_grid = image_tokens->canvas_tile_grid(k);
+        const auto gw = tile_grid.first, gh = tile_grid.second;
         if (i < gw * gh) {
             const uint32_t row = i / gw;
             const uint32_t col = i % gw;
@@ -2948,8 +2952,8 @@ mtmd_memory_usage mtmd_get_memory_usage(const char * mmproj_fname,
         mtmd_log_set(saved_log_callback, saved_log_user_data); // restore log callback
         std::map<ggml_backend_dev_t, size_t> total_mem;
         auto merge = [&](const struct clip_ctx * c) {
-            for (auto & [dev, size] : clip_get_mem_usage(c)) {
-                total_mem[dev] += size;
+            for (const auto & entry : clip_get_mem_usage(c)) {
+                total_mem[entry.first] += entry.second;
             }
         };
         if (ctx->ctx_v) {
